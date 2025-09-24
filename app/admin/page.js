@@ -11,7 +11,7 @@ export default function AdminPage() {
 
   useEffect(() => {
     const password = prompt("Enter admin password:");
-    if (password === "admin123") setAuthorized(true);
+    if (password === "abd123abd") setAuthorized(true);
     else alert("❌ Unauthorized! Reload page to try again.");
   }, []);
 
