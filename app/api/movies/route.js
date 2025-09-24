@@ -1,33 +1,43 @@
-// © 2025 Kaustav Ray. All rights reserved.
-// Licensed under the MIT License.
-
-import { connectDB } from "@/lib/mongodb";
+import mongoose from "mongoose";
 import Movie from "@/models/Movie";
 import { NextResponse } from "next/server";
 
-/**
- * GET /api/movies
- * Returns all movies sorted by newest first
- */
-export async function GET() {
-  try {
-    await connectDB();
-    const movies = await Movie.find().sort({ createdAt: -1 });
-    return NextResponse.json(movies, { status: 200 });
-  } catch (err) {
-    console.error("❌ GET /api/movies failed:", err.message);
-    return NextResponse.json(
-      { error: "Failed to fetch movies" },
-      { status: 503 }
-    );
+// Multiple MongoDB URIs for fallback
+const MONGODB_URIS = [
+  "mongodb+srv://6oqfc2o1_db_user:iJTrD7ic9z0euOF2@cluster0.aydzhbg.mongodb.net/?retryWrites=true&w=majority",
+  // Add more URIs here if needed
+];
+
+let isConnected = false;
+let currentUriIndex = 0;
+
+// Connect to MongoDB with fallback
+async function connectDB() {
+  if (isConnected) return;
+
+  while (currentUriIndex < MONGODB_URIS.length) {
+    try {
+      await mongoose.connect(MONGODB_URIS[currentUriIndex]);
+      isConnected = true;
+      console.log("✅ MongoDB connected to URI:", currentUriIndex + 1);
+      break;
+    } catch (err) {
+      console.error("❌ MongoDB connection failed for URI", currentUriIndex + 1, err);
+      currentUriIndex++;
+    }
   }
+
+  if (!isConnected) throw new Error("All MongoDB connection attempts failed");
 }
 
-/**
- * POST /api/movies
- * Adds a new movie to the database
- * Body: { title, thumbnail, link }
- */
+// GET: Fetch all movies
+export async function GET() {
+  await connectDB();
+  const movies = await Movie.find().sort({ createdAt: -1 });
+  return NextResponse.json(movies);
+}
+
+// POST: Add new movie
 export async function POST(req) {
   try {
     await connectDB();
@@ -35,10 +45,23 @@ export async function POST(req) {
     const movie = await Movie.create(data);
     return NextResponse.json(movie, { status: 201 });
   } catch (err) {
-    console.error("❌ POST /api/movies failed:", err.message);
-    return NextResponse.json(
-      { error: "Failed to add movie" },
-      { status: 503 }
-    );
+    return NextResponse.json({ error: err.message }, { status: 400 });
+  }
+}
+
+// DELETE: Delete a movie
+export async function DELETE(req) {
+  try {
+    await connectDB();
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+    if (!id) return NextResponse.json({ error: "Missing movie id" }, { status: 400 });
+
+    const deleted = await Movie.findByIdAndDelete(id);
+    if (!deleted) return NextResponse.json({ error: "Movie not found" }, { status: 404 });
+
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    return NextResponse.json({ error: err.message }, { status: 400 });
   }
 }
