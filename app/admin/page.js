@@ -5,7 +5,7 @@ export default function AdminPage() {
   const [form, setForm] = useState({ title: "", thumbnail: "", link: "" });
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(false);
-  const adminPassword = "your_admin_password"; // Admin login protection
+  const adminPassword = "your"; // Admin login protection
   const [authorized, setAuthorized] = useState(false);
   const [inputPassword, setInputPassword] = useState("");
 
