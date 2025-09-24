@@ -1,6 +1,3 @@
-// © 2025 Kaustav Ray. All rights reserved.
-// Licensed under the MIT License.
-
 "use client";
 import { useEffect, useState } from "react";
 
@@ -11,7 +8,7 @@ export default function Home() {
     fetch("/api/movies")
       .then((res) => res.json())
       .then(setMovies)
-      .catch(err => console.error("Failed to fetch movies:", err));
+      .catch((err) => console.error("Failed to fetch movies:", err));
   }, []);
 
   return (
@@ -23,11 +20,7 @@ export default function Home() {
             key={movie._id}
             className="bg-gray-900 rounded-lg overflow-hidden hover:scale-105 transition"
           >
-            <a
-              href={movie.link}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <a href={movie.link} target="_blank" rel="noopener noreferrer">
               <img
                 src={movie.thumbnail}
                 alt={movie.title}
@@ -36,11 +29,6 @@ export default function Home() {
             </a>
             <div className="p-2 text-center">{movie.title}</div>
           </div>
-        ))}
-      </div>
-    </main>
-  );
-}          </div>
         ))}
       </div>
     </main>
