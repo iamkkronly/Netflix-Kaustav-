@@ -1,6 +1,3 @@
-// © 2025 Kaustav Ray. All rights reserved.
-// Licensed under the MIT License.
-
 "use client";
 import { useState } from "react";
 
@@ -35,38 +32,6 @@ export default function AdminPage() {
         <input
           type="text"
           placeholder="Movie Title"
-          className="w-full p-2 rounded text-black"
-          value={form.title}
-          onChange={(e) => setForm({ ...form, title: e.target.value })}
-          required
-        />
-        <input
-          type="url"
-          placeholder="Thumbnail URL"
-          className="w-full p-2 rounded text-black"
-          value={form.thumbnail}
-          onChange={(e) => setForm({ ...form, thumbnail: e.target.value })}
-          required
-        />
-        <input
-          type="url"
-          placeholder="Movie Link"
-          className="w-full p-2 rounded text-black"
-          value={form.link}
-          onChange={(e) => setForm({ ...form, link: e.target.value })}
-          required
-        />
-        <button
-          type="submit"
-          className="bg-red-600 px-4 py-2 rounded hover:bg-red-700 disabled:opacity-50"
-          disabled={loading}
-        >
-          {loading ? "Adding..." : "Add Movie"}
-        </button>
-      </form>
-    </main>
-  );
-            }          placeholder="Movie Title"
           className="w-full p-2 rounded text-black"
           value={form.title}
           onChange={(e) => setForm({ ...form, title: e.target.value })}
