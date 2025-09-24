@@ -1,31 +1,43 @@
+// © 2025 Kaustav Ray. All rights reserved.
+// Licensed under the MIT License.
+
 "use client";
+
 import { useState, useEffect } from "react";
 
 export default function AdminPage() {
   const [form, setForm] = useState({ title: "", thumbnail: "", link: "" });
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(false);
-  const adminPassword = "abd123abd"; // Admin login protection
-  const [authorized, setAuthorized] = useState(false);
-  const [inputPassword, setInputPassword] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [password, setPassword] = useState("");
 
-  // Fetch movies
+  const ADMIN_PASSWORD = "abd123abd"; // Change this to secure password
+
+  // Fetch all movies (for admin panel)
   async function fetchMovies() {
     try {
-      const res = await fetch("/api/movies");
+      const res = await fetch("/api/movies?limit=1000");
       const data = await res.json();
-      setMovies(data);
+      setMovies(data.movies || []);
     } catch (err) {
-      console.error("Failed to fetch movies:", err);
+      console.error("Error fetching movies:", err);
     }
   }
 
-  useEffect(() => {
-    if (authorized) fetchMovies();
-  }, [authorized]);
+  // Handle admin login
+  function handleLogin(e) {
+    e.preventDefault();
+    if (password === ADMIN_PASSWORD) {
+      setIsAdmin(true);
+      fetchMovies();
+    } else {
+      alert("❌ Incorrect password");
+    }
+  }
 
-  // Add movie
-  async function handleAdd(e) {
+  // Handle adding a movie
+  async function handleAddMovie(e) {
     e.preventDefault();
     setLoading(true);
     try {
@@ -36,70 +48,72 @@ export default function AdminPage() {
       });
 
       if (res.ok) {
+        alert("✅ Movie added!");
         setForm({ title: "", thumbnail: "", link: "" });
         fetchMovies();
-        alert("✅ Movie added!");
       } else {
-        const data = await res.json();
-        alert("❌ Failed to add movie: " + data.error);
+        const err = await res.json();
+        alert("❌ Failed to add movie: " + err.error);
       }
     } catch (err) {
-      alert("❌ Failed to add movie: " + err.message);
+      alert("❌ Error: " + err.message);
     }
     setLoading(false);
   }
 
-  // Delete movie
-  async function handleDelete(id) {
+  // Handle deleting a movie
+  async function handleDeleteMovie(id) {
     if (!confirm("Are you sure you want to delete this movie?")) return;
 
     try {
       const res = await fetch(`/api/movies?id=${id}`, { method: "DELETE" });
-      const data = await res.json();
-
-      if (res.ok && data.success) {
+      if (res.ok) {
         alert("✅ Movie deleted!");
         fetchMovies();
       } else {
-        alert("❌ Failed to delete movie: " + data.error);
+        const err = await res.json();
+        alert("❌ Failed to delete movie: " + err.error);
       }
     } catch (err) {
-      alert("❌ Failed to delete movie: " + err.message);
+      alert("❌ Error: " + err.message);
     }
   }
 
-  // Admin login screen
-  if (!authorized) {
+  // Admin login page
+  if (!isAdmin) {
     return (
       <main className="p-6">
-        <h1 className="text-2xl font-bold mb-4">🔒 Admin Login</h1>
-        <input
-          type="password"
-          placeholder="Enter password"
-          value={inputPassword}
-          onChange={(e) => setInputPassword(e.target.value)}
-          className="w-full p-2 rounded text-black"
-        />
-        <button
-          className="bg-red-600 px-4 py-2 rounded mt-2 hover:bg-red-700"
-          onClick={() => {
-            if (inputPassword === adminPassword) setAuthorized(true);
-            else alert("❌ Wrong password");
-          }}
-        >
-          Login
-        </button>
+        <h1 className="text-2xl font-bold mb-4">🔐 Admin Login</h1>
+        <form onSubmit={handleLogin} className="space-y-4 max-w-md">
+          <input
+            type="password"
+            placeholder="Enter Admin Password"
+            className="w-full p-2 rounded text-black"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <button
+            type="submit"
+            className="bg-red-600 px-4 py-2 rounded hover:bg-red-700"
+          >
+            Login
+          </button>
+        </form>
       </main>
     );
   }
 
-  // Admin panel
+  // Admin panel page
   return (
     <main className="p-6">
       <h1 className="text-2xl font-bold mb-4">📤 Admin Panel</h1>
 
       {/* Add Movie Form */}
-      <form onSubmit={handleAdd} className="space-y-4 max-w-md mb-6">
+      <form
+        onSubmit={handleAddMovie}
+        className="space-y-4 max-w-md mb-6 bg-gray-900 p-4 rounded"
+      >
         <input
           type="text"
           placeholder="Movie Title"
@@ -133,20 +147,29 @@ export default function AdminPage() {
         </button>
       </form>
 
-      {/* Movies List with Delete */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+      {/* Movies List */}
+      <h2 className="text-xl font-bold mb-2">🎬 Movies</h2>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
         {movies.map((movie) => (
-          <div key={movie._id} className="bg-gray-900 rounded-lg overflow-hidden p-2">
-            <div className="text-center mb-2">{movie.title}</div>
+          <div
+            key={movie._id}
+            className="bg-gray-900 rounded-lg p-2 text-center relative"
+          >
+            <img
+              src={movie.thumbnail}
+              alt={movie.title}
+              className="w-full h-32 object-cover rounded"
+            />
+            <div className="mt-1">{movie.title}</div>
             <button
-              className="bg-gray-700 px-2 py-1 rounded hover:bg-gray-600 w-full"
-              onClick={() => handleDelete(movie._id)}
+              onClick={() => handleDeleteMovie(movie._id)}
+              className="absolute top-1 right-1 bg-red-600 px-2 py-1 text-xs rounded hover:bg-red-700"
             >
-              Delete Movie
+              Delete
             </button>
           </div>
         ))}
       </div>
     </main>
   );
-            }
+}
