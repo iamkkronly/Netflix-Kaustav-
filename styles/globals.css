@@ -1,0 +1,10 @@
+/* © 2025 Kaustav Ray. All rights reserved.
+   Licensed under the MIT License. */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: sans-serif;
+}
