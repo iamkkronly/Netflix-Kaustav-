@@ -10,7 +10,8 @@ export default function Home() {
   useEffect(() => {
     fetch("/api/movies")
       .then((res) => res.json())
-      .then(setMovies);
+      .then(setMovies)
+      .catch(err => console.error("Failed to fetch movies:", err));
   }, []);
 
   return (
@@ -35,6 +36,11 @@ export default function Home() {
             </a>
             <div className="p-2 text-center">{movie.title}</div>
           </div>
+        ))}
+      </div>
+    </main>
+  );
+}          </div>
         ))}
       </div>
     </main>
