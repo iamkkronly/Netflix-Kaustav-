@@ -30,11 +30,31 @@ async function connectDB() {
   if (!isConnected) throw new Error("All MongoDB connection attempts failed");
 }
 
-// GET: Fetch all movies
-export async function GET() {
+// GET: Fetch movies with pagination & search
+export async function GET(req) {
   await connectDB();
-  const movies = await Movie.find().sort({ createdAt: -1 });
-  return NextResponse.json(movies);
+
+  const { searchParams } = new URL(req.url);
+
+  const searchQuery = searchParams.get("search") || "";
+  const limit = parseInt(searchParams.get("limit") || "10");
+  const page = parseInt(searchParams.get("page") || "1");
+  const skip = (page - 1) * limit;
+
+  const query = searchQuery
+    ? { title: { $regex: searchQuery, $options: "i" } } // case-insensitive fuzzy search
+    : {};
+
+  try {
+    const movies = await Movie.find(query)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    return NextResponse.json({ movies });
+  } catch (err) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
 }
 
 // POST: Add new movie
@@ -49,16 +69,21 @@ export async function POST(req) {
   }
 }
 
-// DELETE: Delete a movie
+// DELETE: Delete a movie by id
 export async function DELETE(req) {
   try {
     await connectDB();
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
-    if (!id) return NextResponse.json({ error: "Missing movie id" }, { status: 400 });
+
+    if (!id) {
+      return NextResponse.json({ error: "Missing movie id" }, { status: 400 });
+    }
 
     const deleted = await Movie.findByIdAndDelete(id);
-    if (!deleted) return NextResponse.json({ error: "Movie not found" }, { status: 404 });
+    if (!deleted) {
+      return NextResponse.json({ error: "Movie not found" }, { status: 404 });
+    }
 
     return NextResponse.json({ success: true });
   } catch (err) {
