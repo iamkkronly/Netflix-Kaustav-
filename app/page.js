@@ -7,6 +7,8 @@ import { useState, useEffect, useCallback } from "react";
 
 // Define constants
 const MOVIES_PER_PAGE = 10;
+// ⚠️ Replace this with your actual Support Group URL
+const SUPPORT_GROUP_LINK = "https://t.me/netflix1prime"; 
 
 export default function Homepage() {
   // State variables from your code
@@ -42,14 +44,12 @@ export default function Homepage() {
             return newMovies;
           }
           // Otherwise, append the new movies
-          // Filter out duplicates just in case, though API should handle it
           const newIds = new Set(prev.map(m => m._id));
           const uniqueNewMovies = newMovies.filter(m => !newIds.has(m._id));
           return [...prev, ...uniqueNewMovies];
         });
 
         // Check if there are more movies to load
-        // data.total is the total number of movies matching the search/filter
         const totalFetched = (currentPage * MOVIES_PER_PAGE) + (reset ? 0 : movies.length);
         setHasMore(data.total > totalFetched);
         
@@ -71,7 +71,6 @@ export default function Homepage() {
   // Effect to load movies when the component mounts or page/searchQuery changes
   useEffect(() => {
     // Reset page and fetch when searchQuery changes
-    // This handles initial load (page=1, searchQuery="") and new searches
     if (page === 1) {
         fetchMovies(true); // Fetch with reset=true if it's page 1
     } else if (page > 1) {
@@ -97,11 +96,24 @@ export default function Homepage() {
   // ================= UI / RETURN =================
   return (
     <div className="min-h-screen bg-gray-900 text-white p-4 md:p-8">
-      <div className="flex justify-between items-center mb-6 border-b border-gray-700 pb-4">
-        <h1 className="text-3xl md:text-4xl font-extrabold text-red-500">Movie Library</h1>
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 border-b border-gray-700 pb-4">
+        
+        <div className="flex items-center justify-between w-full md:w-auto mb-4 md:mb-0">
+            <h1 className="text-3xl md:text-4xl font-extrabold text-red-500 mr-8">Movie Library</h1>
+            
+            {/* ✅ Support Group Link Added Here */}
+            <a 
+              href={SUPPORT_GROUP_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition duration-200 whitespace-nowrap"
+            >
+              Support Group
+            </a>
+        </div>
         
         {/* Search Bar */}
-        <form onSubmit={handleSearch} className="flex gap-2 w-full max-w-sm">
+        <form onSubmit={handleSearch} className="flex gap-2 w-full md:max-w-sm">
           <input
             type="text"
             placeholder="Search movies"
