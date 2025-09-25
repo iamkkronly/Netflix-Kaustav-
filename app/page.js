@@ -88,7 +88,7 @@ export default function Homepage() {
 
   // ================= UI / RETURN =================
   return (
-    // 🔥 ADJUSTED: True black background for maximum darkness
+    // 🔥 Main Background: True black (bg-black)
     <div className="min-h-screen text-white p-4 md:p-12 relative bg-black"> 
 
       {/* Header: Sticky, Blurred, and Stylish - Set to near-opaque black on black background */}
