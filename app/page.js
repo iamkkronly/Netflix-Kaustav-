@@ -152,7 +152,7 @@ export default function Homepage() {
           {movies.map((movie, index) => (
             <div
               key={movie._id}
-              // 🔥 FIX APPLIED: Using backticks (Template Literal) for multi-line className string
+              // FIX 1: Use Template Literal for multi-line className (Card Container)
               className={`bg-gray-900/80 p-3 rounded-xl shadow-2xl shadow-black 
                          flex flex-col items-center relative group overflow-hidden border border-gray-800
                          transform transition-all duration-500 ease-out 
@@ -171,8 +171,9 @@ export default function Homepage() {
                   <img
                       src={movie.thumbnail}
                       alt={movie.title}
-                      className="w-full h-60 object-cover rounded-lg mb-3 
-                                transition duration-500 group-hover:opacity-85 group-hover:scale-[1.02] group-hover:shadow-xl"
+                      // FIX 2: Use Template Literal for multi-line className (Image)
+                      className={`w-full h-60 object-cover rounded-lg mb-3 
+                                transition duration-500 group-hover:opacity-85 group-hover:scale-[1.02] group-hover:shadow-xl`}
                   />
                   {/* Subtle Red Overlay on Hover */}
                   <div className="absolute inset-0 bg-red-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
