@@ -6,7 +6,7 @@
 import { useState, useEffect, useCallback } from "react";
 
 // Define constants
-const MOVIES_PER_PAGE = 10;
+const MOVIES_PER_PAGE = 11;
 // Updated link based on your previous input
 const SUPPORT_GROUP_LINK = "https://t.me/netflix1prime"; 
 
