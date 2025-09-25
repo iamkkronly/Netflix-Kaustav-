@@ -5,7 +5,7 @@ import "./../styles/globals.css";
 
 export const metadata = {
   title: "Movie Gallery",
-  description: "Netflix-like movie site",
+  description: "Netflix-like movie site Kaustav Ray",
 };
 
 export default function RootLayout({ children }) {
