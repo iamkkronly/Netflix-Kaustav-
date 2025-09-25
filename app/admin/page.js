@@ -8,36 +8,54 @@ import { useState, useEffect } from "react";
 export default function AdminPage() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [password, setPassword] = useState("");
-  const [movies, setMovies] = useState([]);
-  const [form, setForm] = useState({ title: "", thumbnail: "", link: "" }); // Added 'link'
+  const [movies, setMovies] = useState([]); // This stores the currently displayed and filtered list
+  const [allMovies, setAllMovies] = useState([]); // This stores the full list fetched from API
+  const [form, setForm] = useState({ title: "", thumbnail: "", link: "" });
+  const [searchQuery, setSearchQuery] = useState(""); // New State for search input
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   // ✅ Hardcoded password for demo
   const ADMIN_PASSWORD = "abd123abd"; // change this to your secret
 
-  // Fetch movies
+  // Function to fetch ALL movies for the admin panel
   async function fetchMovies() {
+    setLoading(true);
     try {
-      // Use the existing movie API route for listing
-      const res = await fetch("/api/movies"); 
+      // Fetch all movies by setting a large limit (e.g., 999)
+      const res = await fetch("/api/movies?limit=999"); 
       const data = await res.json();
-      // The API returns an object {movies, total, page, limit} if search is used, 
-      // but the front-end fetch in page.js expects data to be an array.
-      // Assuming the movie API in route.js returns the movies array directly 
-      // when no query/page/limit is specified for the admin panel.
-      if (Array.isArray(data.movies)) { // Adjusting for expected API response structure from route.js
-        setMovies(data.movies);
-      } else if (Array.isArray(data)) {
-        setMovies(data);
-      }
+      
+      const movieList = Array.isArray(data.movies) ? data.movies : Array.isArray(data) ? data : [];
+      
+      setAllMovies(movieList); // Store the full list
+      setMovies(movieList);    // Display the full list initially
+      
     } catch (err) {
       console.error("Failed to fetch movies", err);
+      setMessage("❌ Failed to fetch movies from the server.");
+    } finally {
+        setLoading(false);
     }
   }
 
   useEffect(() => {
     if (loggedIn) fetchMovies();
   }, [loggedIn]);
+  
+  // New useEffect to handle client-side search filtering
+  useEffect(() => {
+    if (searchQuery.trim() === "") {
+      setMovies(allMovies); // If search is empty, show all movies
+    } else {
+      const lowerCaseQuery = searchQuery.trim().toLowerCase();
+      const filtered = allMovies.filter(movie => 
+        movie.title.toLowerCase().includes(lowerCaseQuery)
+      );
+      setMovies(filtered);
+    }
+  }, [searchQuery, allMovies]); // Re-run when search query or the master list changes
+
 
   // Add movie
   async function handleAddMovie(e) {
@@ -60,7 +78,7 @@ export default function AdminPage() {
       if (res.ok) {
         setMessage("✅ Movie added successfully!");
         setForm({ title: "", thumbnail: "", link: "" }); // Reset form
-        fetchMovies();
+        fetchMovies(); // Refresh the full list
       } else {
         setMessage("❌ Failed to add: " + (data.error || "Unknown error"));
       }
@@ -76,7 +94,6 @@ export default function AdminPage() {
     if (!window.confirm("Are you sure you want to delete this movie?")) return;
 
     try {
-      // Use the movie API route with the ID as a query parameter for DELETE
       const res = await fetch(`/api/movies?id=${id}`, {
         method: "DELETE",
       });
@@ -84,7 +101,7 @@ export default function AdminPage() {
       const data = await res.json();
       if (res.ok) {
         setMessage("✅ Movie deleted successfully");
-        fetchMovies();
+        fetchMovies(); // Refresh the full list
       } else {
         setMessage("❌ Failed to delete: " + (data.error || "Unknown error"));
       }
@@ -99,7 +116,7 @@ export default function AdminPage() {
     if (password === ADMIN_PASSWORD) {
       setLoggedIn(true);
       setPassword("");
-      setMessage(""); // Clear message on successful login
+      setMessage("");
     } else {
       setMessage("❌ Wrong password");
     }
@@ -178,9 +195,22 @@ export default function AdminPage() {
       </form>
 
       {message && <p className="mb-6 p-3 bg-yellow-900/50 text-yellow-400 rounded-lg">{message}</p>}
-
+      
+      {/* Search Input and Movie Count */}
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-5 border-b border-gray-700 pb-2">
+        <h2 className="text-xl font-bold mb-3 md:mb-0">All Movies ({allMovies.length})</h2>
+        <input
+            type="text"
+            placeholder="Search movie title..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="p-2 rounded text-black w-full md:w-80 focus:outline-none focus:ring-2 focus:ring-red-500"
+        />
+      </div>
+      
+      {loading && <p className="text-center text-gray-400 mt-5">Loading movies...</p>}
+      
       {/* Movies List */}
-      <h2 className="text-xl font-bold mb-5 border-b border-gray-700 pb-2">All Movies ({movies.length})</h2>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-6">
         {movies.map((movie) => (
           <div
@@ -202,7 +232,12 @@ export default function AdminPage() {
           </div>
         ))}
       </div>
-      {movies.length === 0 && (
+      
+      {/* No Results Message */}
+      {!loading && movies.length === 0 && searchQuery.trim() && (
+        <p className="text-center text-gray-500 mt-10">No movies found matching "{searchQuery}".</p>
+      )}
+      {!loading && allMovies.length === 0 && !searchQuery.trim() && (
         <p className="text-center text-gray-500 mt-10">No movies found in the database.</p>
       )}
     </div>
