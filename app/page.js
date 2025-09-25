@@ -20,7 +20,6 @@ export default function Homepage() {
   const [error, setError] = useState(null); // Added error state
 
   // Function to fetch movies (with search and pagination)
-  // useCallback is used to memoize the function and prevent unnecessary re-creation
   const fetchMovies = useCallback(async (reset = false) => {
     setLoading(true);
     setError(null);
@@ -39,22 +38,18 @@ export default function Homepage() {
         const newMovies = data.movies;
         
         setMovies((prev) => {
-          // If reset is true (new search or initial load), replace existing movies
           if (reset) {
             return newMovies;
           }
-          // Otherwise, append the new movies
           const newIds = new Set(prev.map(m => m._id));
           const uniqueNewMovies = newMovies.filter(m => !newIds.has(m._id));
           return [...prev, ...uniqueNewMovies];
         });
 
-        // Check if there are more movies to load
         const totalFetched = (currentPage * MOVIES_PER_PAGE) + (reset ? 0 : movies.length);
         setHasMore(data.total > totalFetched);
         
       } else {
-        // Handle unexpected data format or an API error message
         console.error("API response error:", data);
         setError("Failed to parse movie data.");
         setHasMore(false);
@@ -62,27 +57,25 @@ export default function Homepage() {
     } catch (err) {
       console.error("Failed to fetch movies:", err);
       setError("Failed to connect to the server.");
-      setHasMore(false); // No more to load on error
+      setHasMore(false);
     } finally {
       setLoading(false);
     }
-  }, [page, searchQuery, movies.length]); // Dependencies for useCallback
+  }, [page, searchQuery, movies.length]);
 
   // Effect to load movies when the component mounts or page/searchQuery changes
   useEffect(() => {
-    // Reset page and fetch when searchQuery changes
     if (page === 1) {
-        fetchMovies(true); // Fetch with reset=true if it's page 1
+        fetchMovies(true); 
     } else if (page > 1) {
-        fetchMovies(false); // Fetch normally if page > 1 (i.e., from Load More click)
+        fetchMovies(false); 
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, searchQuery]); // Only fetch when page or searchQuery changes
+  }, [page, searchQuery]); 
 
   // Handles search form submission
   function handleSearch(e) {
     e.preventDefault();
-    // Reset the page to 1 and let the useEffect hook handle the fetch
     setPage(1);
   }
   
@@ -95,127 +88,160 @@ export default function Homepage() {
 
   // ================= UI / RETURN =================
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-4 md:p-8">
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 border-b border-gray-700 pb-4">
-        
-        <div className="flex items-center justify-between w-full md:w-auto mb-4 md:mb-0">
-            <h1 className="text-3xl md:text-4xl font-extrabold text-red-500 mr-8">Movie Library</h1>
-            
-            {/* Support Group Link */}
-            <a 
-              href={SUPPORT_GROUP_LINK}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition duration-200 whitespace-nowrap"
-            >
-              Support Group
-            </a>
-        </div>
-        
-        {/* Search Bar */}
-        <form onSubmit={handleSearch} className="flex gap-2 w-full md:max-w-sm">
-          <input
-            type="text"
-            placeholder="Search movies"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="flex-grow p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-red-500"
-          />
-          <button
-            type="submit"
-            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition duration-200"
-          >
-            Search
-          </button>
-        </form>
-      </div>
+    // 🔥 Background: Deep Cinematic Gradient
+    <div className="min-h-screen text-white p-4 md:p-12 relative" 
+         style={{ background: 'radial-gradient(circle at center, #1a0808 0%, #000000 100%)' }}>
 
-      {/* Message and Error Area */}
-      {error && (
-        <p className="mb-4 p-3 bg-red-900/50 text-red-400 rounded-lg text-center font-medium">
-          ❌ {error}
-        </p>
-      )}
-      
-      {loading && page === 1 && !movies.length && (
-        <p className="text-gray-400 text-center text-xl mt-12">Loading movies...</p>
-      )}
-
-      {/* Movies Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-        {movies.map((movie) => (
-          <div
-            key={movie._id}
-            className="bg-gray-800 p-3 rounded-lg shadow-xl flex flex-col items-center transform hover:scale-[1.02] transition duration-300 relative group overflow-hidden"
-          >
-            {/* Movie Thumbnail - use movie.link if available, otherwise just display image */}
-            <a 
-                href={movie.link || "#"} 
-                target={movie.link ? "_blank" : "_self"} 
+      {/* 🔥 Header: Sticky, Blurred, and Stylish */}
+      <header className="sticky top-0 z-40 bg-black/80 backdrop-blur-sm shadow-xl mb-8 border-b border-red-900/50 pt-4 pb-6 px-4 md:px-0 -mx-4 md:-mx-12">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center w-full max-w-7xl mx-auto">
+          
+          <div className="flex items-center justify-between w-full md:w-auto mb-4 md:mb-0">
+              {/* Cinematic Title */}
+              <h1 className="text-4xl md:text-5xl font-extrabold text-red-600 mr-8 drop-shadow-[0_4px_6px_rgba(255,0,0,0.5)] tracking-wider">
+                  Movie Library
+              </h1>
+              
+              {/* Support Group Link - Highlighted Button */}
+              <a 
+                href={SUPPORT_GROUP_LINK}
+                target="_blank"
                 rel="noopener noreferrer"
-                className="w-full"
-            >
-                <img
-                    src={movie.thumbnail}
-                    alt={movie.title}
-                    className="w-full h-48 object-cover rounded-md mb-3 transition duration-300 group-hover:opacity-80"
-                />
-            </a>
-
-            {/* 🔥 MODIFIED BLOCK: Movie Title - Two-line wrap logic */}
-            <div className="w-full h-10 overflow-hidden mb-2">
-                <p 
-                    className="font-semibold text-center text-md px-1" 
-                    // This inline style forces text to wrap into exactly 2 lines (Webkit browsers)
-                    style={{ 
-                        display: '-webkit-box', 
-                        WebkitLineClamp: 2, 
-                        WebkitBoxOrient: 'vertical', 
-                        overflow: 'hidden' 
-                    }}
-                >
-                    {movie.title}
-                </p>
-            </div>
-            {/* END MODIFIED BLOCK */}
-
-            <a 
-                href={movie.link || "#"} 
-                target={movie.link ? "_blank" : "_self"} 
-                rel="noopener noreferrer"
-                className="mt-1 w-full text-center bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium text-sm transition duration-200"
-            >
-                Watch Now
-            </a>
+                className="bg-red-700 hover:bg-red-600 text-white px-5 py-2 rounded-full font-bold text-sm transition duration-300 shadow-md shadow-red-800/50 hover:shadow-red-500/80 whitespace-nowrap"
+              >
+                🚀 Support Group
+              </a>
           </div>
-        ))}
-      </div>
-
-      {/* Load More Button & Status */}
-      {(hasMore || loading) && (
-        <div className="flex justify-center mt-10">
-          {loading ? (
-            <p className="text-gray-400 font-medium p-3">Loading more movies...</p>
-          ) : hasMore ? (
+          
+          {/* Search Bar */}
+          <form onSubmit={handleSearch} className="flex gap-3 w-full md:max-w-md">
+            <input
+              type="text"
+              placeholder="Search epic sagas..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              // Enhanced input styling
+              className="flex-grow p-3 rounded-xl bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-600 transition duration-300 border border-gray-700"
+            />
             <button
-              onClick={handleLoadMore}
-              className="bg-green-600 hover:bg-green-700 text-white py-3 px-8 rounded-lg text-lg font-semibold transition duration-200 shadow-lg"
-              disabled={loading}
+              type="submit"
+              // Enhanced button styling
+              className="bg-red-600 hover:bg-red-700 text-white px-5 py-3 rounded-xl font-bold transition duration-300 shadow-lg shadow-red-500/50 hover:shadow-red-400/80"
             >
-              Load More
+              Search
             </button>
-          ) : (
-             <p className="text-gray-500 font-medium p-3">No more movies to load.</p>
-          )}
+          </form>
         </div>
-      )}
+      </header>
+
+      {/* Content Container */}
+      <main className="max-w-7xl mx-auto">
+        {/* Message and Error Area */}
+        {error && (
+          <p className="mb-6 p-4 bg-red-900/70 text-red-300 rounded-xl text-center font-medium shadow-inner">
+            ❌ {error}
+          </p>
+        )}
+        
+        {loading && page === 1 && !movies.length && (
+          <p className="text-gray-400 text-center text-2xl mt-20 animate-pulse">Loading the Cinematic Universe...</p>
+        )}
+
+        {/* Movies Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 md:gap-8">
+          {movies.map((movie, index) => (
+            <div
+              key={movie._id}
+              // 🔥 Movie Card: Deep shadows, 3D hover effect, and transition
+              className="bg-gray-900/80 p-3 rounded-xl shadow-2xl shadow-black 
+                         flex flex-col items-center relative group overflow-hidden border border-gray-800
+                         transform transition-all duration-500 ease-out 
+                         hover:scale-[1.05] hover:shadow-red-900/80 hover:bg-gray-800/90 hover:z-10"
+              
+              // Subtle entrance animation wave
+              style={{ animation: `fadeIn 0.6s ease-out forwards`, animationDelay: `${index * 0.08}s` }}
+            >
+              {/* Movie Thumbnail */}
+              <a 
+                  href={movie.link || "#"} 
+                  target={movie.link ? "_blank" : "_self"} 
+                  rel="noopener noreferrer"
+                  className="w-full relative block"
+              >
+                  <img
+                      src={movie.thumbnail}
+                      alt={movie.title}
+                      className="w-full h-60 object-cover rounded-lg mb-3 
+                                transition duration-500 group-hover:opacity-85 group-hover:scale-[1.02] group-hover:shadow-xl"
+                  />
+                  {/* Subtle Red Overlay on Hover */}
+                  <div className="absolute inset-0 bg-red-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </a>
+
+              {/* Movie Title - Two-line wrap logic (Fix carried over) */}
+              <div className="w-full h-10 overflow-hidden mb-2">
+                  <p 
+                      className="font-bold text-center text-base px-1 text-gray-100" 
+                      style={{ 
+                          display: '-webkit-box', 
+                          WebkitLineClamp: 2, 
+                          WebkitBoxOrient: 'vertical', 
+                          overflow: 'hidden' 
+                      }}
+                  >
+                      {movie.title}
+                  </p>
+              </div>
+
+              {/* Watch Now Button */}
+              <a 
+                  href={movie.link || "#"} 
+                  target={movie.link ? "_blank" : "_self"} 
+                  rel="noopener noreferrer"
+                  // Stylish Watch Button
+                  className="mt-2 w-full text-center bg-red-600 hover:bg-red-500 text-white py-2 rounded-full font-bold text-sm transition duration-300 shadow-md shadow-red-500/40 hover:shadow-red-400/80"
+              >
+                  ▶️ Watch Now
+              </a>
+            </div>
+          ))}
+        </div>
+
+        {/* Load More Button & Status */}
+        {(hasMore || loading) && (
+          <div className="flex justify-center mt-12">
+            {loading && movies.length > 0 ? (
+              <p className="text-red-400 font-bold p-3 animate-pulse">Loading the next batch...</p>
+            ) : hasMore ? (
+              <button
+                onClick={handleLoadMore}
+                // Cinematic Load More Button
+                className="bg-green-600 hover:bg-green-700 text-white py-3 px-10 rounded-full text-lg font-extrabold transition duration-300 shadow-xl shadow-green-500/50 hover:shadow-green-400/80 uppercase tracking-wider"
+                disabled={loading}
+              >
+                Load More
+              </button>
+            ) : (
+               <p className="text-gray-500 font-medium p-3 mt-10">You've reached the end of the galaxy!</p>
+            )}
+          </div>
+        )}
+        
+        {/* If no movies found after initial load */}
+        {!loading && movies.length === 0 && (
+           <p className="text-center text-gray-500 text-2xl mt-20">
+              {searchQuery ? `No epic sagas found for "${searchQuery}".` : "No movies available yet. Time to add some!"}
+           </p>
+        )}
+      </main>
       
-      {/* If no movies found after initial load */}
-      {!loading && movies.length === 0 && (
-         <p className="text-center text-gray-500 text-xl mt-12">
-            {searchQuery ? `No results found for "${searchQuery}".` : "No movies available yet."}
-         </p>
-      )}
+      {/* Required style for the subtle entrance animation */}
+      <style jsx global>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(25px) rotateX(10deg); }
+          to { opacity: 1; transform: translateY(0) rotateX(0deg); }
+        }
+      `}</style>
     </div>
   );
 }
