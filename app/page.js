@@ -88,16 +88,16 @@ export default function Homepage() {
 
   // ================= UI / RETURN =================
   return (
-    // 🔥 New Background Color: Muted dark green/blue (using a custom hex via style)
-    <div className="min-h-screen text-white p-4 md:p-12 relative" 
-         style={{ backgroundColor: '#1C292E' }}> 
+    // 🔥 ADJUSTED Background: Changed from custom dark hex to standard, slightly brighter bg-gray-800
+    <div className="min-h-screen text-white p-4 md:p-12 relative bg-gray-800"> 
+         {/* Removed inline style for background color */}
 
       {/* Header: Sticky, Blurred, and Stylish - Adjusted colors to match new theme */}
-      <header className="sticky top-0 z-40 bg-[#1C292E]/95 backdrop-blur-sm shadow-xl mb-8 border-b border-[#2C4953] pt-4 pb-6 px-4 md:px-0 -mx-4 md:-mx-12">
+      <header className="sticky top-0 z-40 bg-gray-800/95 backdrop-blur-sm shadow-xl mb-8 border-b border-gray-700 pt-4 pb-6 px-4 md:px-0 -mx-4 md:-mx-12">
         <div className="flex flex-col md:flex-row md:justify-between md:items-center w-full max-w-7xl mx-auto">
           
           <div className="flex items-center justify-between w-full md:w-auto mb-4 md:mb-0">
-              {/* Cinematic Title - Changed accent color to vibrant green */}
+              {/* Cinematic Title - Vibrant green accent maintained */}
               <h1 className="text-4xl md:text-5xl font-extrabold text-green-400 mr-8 drop-shadow-[0_4px_6px_rgba(52,211,163,0.5)] tracking-wider">
                   Movie Library
               </h1>
@@ -152,11 +152,11 @@ export default function Homepage() {
           {movies.map((movie, index) => (
             <div
               key={movie._id}
-              // 🔥 Card: Increased rounding (rounded-2xl) and adjusted colors/shadows
-              className={`bg-[#2C4953] p-3 rounded-2xl shadow-xl shadow-black/50
-                         flex flex-col items-center relative group overflow-hidden border border-[#3C5963]
+              // 🔥 ADJUSTED Card: Changed from custom dark hex to standard, brighter bg-gray-700
+              className={`bg-gray-700 p-3 rounded-2xl shadow-xl shadow-black/50
+                         flex flex-col items-center relative group overflow-hidden border border-gray-600
                          transform transition-all duration-500 ease-out 
-                         hover:scale-[1.05] hover:shadow-green-900/80 hover:bg-[#3C5963] hover:z-10`}
+                         hover:scale-[1.05] hover:shadow-green-900/80 hover:bg-gray-600 hover:z-10`}
               
               // Subtle entrance animation wave
               style={{ animation: `fadeIn 0.6s ease-out forwards`, animationDelay: `${index * 0.08}s` }}
@@ -223,14 +223,14 @@ export default function Homepage() {
                 Load More
               </button>
             ) : (
-               <p className="text-gray-500 font-medium p-3 mt-10">You've reached the end of the galaxy!</p>
+               <p className="text-gray-400 font-medium p-3 mt-10">You've reached the end of the galaxy!</p>
             )}
           </div>
         )}
         
         {/* If no movies found after initial load */}
         {!loading && movies.length === 0 && (
-           <p className="text-center text-gray-500 text-2xl mt-20">
+           <p className="text-center text-gray-400 text-2xl mt-20">
               {searchQuery ? `No epic sagas found for "${searchQuery}".` : "No movies available yet. Time to add some!"}
            </p>
         )}
