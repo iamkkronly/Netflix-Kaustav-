@@ -1,98 +1,119 @@
-"use client";
-import { useEffect, useState } from "react";
+// © 2025 Kaustav Ray. All rights reserved.
+// Licensed under the MIT License.
 
-export default function Home() {
+"use client";
+
+import { useState, useEffect } from "react";
+
+export default function HomePage() {
   const [movies, setMovies] = useState([]);
-  const [query, setQuery] = useState("");
+  const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  const [loadingMore, setLoadingMore] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
-  useEffect(() => {
-    loadMovies();
-  }, [page]);
-
-  async function loadMovies() {
-    setLoadingMore(true);
+  // Fetch movies from API
+  async function fetchMovies(reset = false, query = search, pageNum = page) {
+    setLoading(true);
     try {
-      const res = await fetch(`/api/movies?limit=10&page=${page}&search=${query}`);
+      const res = await fetch(
+        `/api/movies?search=${encodeURIComponent(query)}&page=${pageNum}&limit=10`
+      );
       const data = await res.json();
-      if (page === 1) setMovies(data.movies);
-      else setMovies((prev) => [...prev, ...data.movies]);
-      setHasMore(data.movies.length === 10);
+
+      if (reset) {
+        setMovies(data.movies || []);
+      } else {
+        setMovies((prev) => [...prev, ...(data.movies || [])]);
+      }
+
+      // If fewer than 10 results, stop "load more"
+      if (!data.movies || data.movies.length < 10) {
+        setHasMore(false);
+      } else {
+        setHasMore(true);
+      }
     } catch (err) {
-      console.error("Failed to load movies:", err);
+      console.error("Error fetching movies:", err);
     }
-    setLoadingMore(false);
+    setLoading(false);
   }
 
+  // Initial load
+  useEffect(() => {
+    fetchMovies(true, "", 1);
+  }, []);
+
+  // Search handler
   function handleSearch(e) {
     e.preventDefault();
     setPage(1);
-    loadMovies();
+    fetchMovies(true, search, 1);
   }
 
-  function loadMore() {
-    if (hasMore) setPage((prev) => prev + 1);
+  // Load more handler
+  function handleLoadMore() {
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchMovies(false, search, nextPage);
   }
 
   return (
     <main className="p-6">
+      {/* Header with Support Link */}
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-3xl font-bold">🎬 Movie Gallery</h1>
+        <h1 className="text-2xl font-bold">🎬 Movie Gallery</h1>
         <a
-          href="https://t.me/Netflix1prime" // Replace with your actual Telegram group link
+          href="https://t.me/Netflix1prime" // 🔗 Replace with your Telegram group link
           target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-400 hover:underline"
+          className="text-blue-400 underline"
         >
           Support Group
         </a>
       </div>
 
-      <form onSubmit={handleSearch} className="mb-6">
+      {/* Search Bar */}
+      <form onSubmit={handleSearch} className="mb-4">
         <input
           type="text"
           placeholder="Search movies..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="p-2 rounded w-full text-black"
+          className="w-full p-2 rounded text-black"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
         />
       </form>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+      {/* Movies Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
         {movies.map((movie) => (
           <div
-            key={movie._id}
-            className="bg-gray-900 rounded-lg overflow-hidden hover:scale-105 transition"
+            key={movie._id} // ✅ fixes duplicate thumbnail issue
+            className="bg-gray-900 rounded-lg p-2 text-center"
           >
-            <a
-              href={movie.link}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <a href={movie.link} target="_blank" rel="noopener noreferrer">
               <img
                 src={movie.thumbnail}
                 alt={movie.title}
-                className="w-full h-48 object-cover"
+                className="w-full h-40 object-cover rounded"
               />
+              <div className="mt-2 text-sm">{movie.title}</div>
             </a>
-            <div className="p-2 text-center">{movie.title}</div>
           </div>
         ))}
       </div>
 
+      {/* Load More Button */}
       {hasMore && (
-        <div className="flex justify-center mt-6">
+        <div className="flex justify-center mt-4">
           <button
-            onClick={loadMore}
-            disabled={loadingMore}
+            onClick={handleLoadMore}
+            disabled={loading}
             className="bg-red-600 px-4 py-2 rounded hover:bg-red-700 disabled:opacity-50"
           >
-            {loadingMore ? "Loading..." : "Load More"}
+            {loading ? "Loading..." : "Next"}
           </button>
         </div>
       )}
     </main>
   );
-}
+                  }
