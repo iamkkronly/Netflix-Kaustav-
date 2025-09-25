@@ -88,12 +88,13 @@ export default function Homepage() {
 
   // ================= UI / RETURN =================
   return (
-    // Background: Deep Cinematic Gradient
-    <div className="min-h-screen text-white p-4 md:p-12 relative" 
-         style={{ background: 'radial-gradient(circle at center, #1a0808 0%, #000000 100%)' }}>
+    // 🔥 ADJUSTED Background: Lighter Dark Gray (No deep black gradient)
+    <div className="min-h-screen text-white p-4 md:p-12 relative bg-gray-900">
+         {/* Removed inline style for radial gradient to use simple bg-gray-900 */}
 
       {/* Header: Sticky, Blurred, and Stylish */}
-      <header className="sticky top-0 z-40 bg-black/80 backdrop-blur-sm shadow-xl mb-8 border-b border-red-900/50 pt-4 pb-6 px-4 md:px-0 -mx-4 md:-mx-12">
+      {/* Increased header opacity slightly for better contrast on a lighter dark background */}
+      <header className="sticky top-0 z-40 bg-gray-900/95 backdrop-blur-sm shadow-xl mb-8 border-b border-red-900/50 pt-4 pb-6 px-4 md:px-0 -mx-4 md:-mx-12">
         <div className="flex flex-col md:flex-row md:justify-between md:items-center w-full max-w-7xl mx-auto">
           
           <div className="flex items-center justify-between w-full md:w-auto mb-4 md:mb-0">
@@ -152,11 +153,11 @@ export default function Homepage() {
           {movies.map((movie, index) => (
             <div
               key={movie._id}
-              // FIX 1: Use Template Literal for multi-line className (Card Container)
-              className={`bg-gray-900/80 p-3 rounded-xl shadow-2xl shadow-black 
-                         flex flex-col items-center relative group overflow-hidden border border-gray-800
+              // 🔥 ADJUSTED Card Color: Changed bg-gray-900/80 to bg-gray-800/90 for slightly lighter appearance and better contrast
+              className={`bg-gray-800/90 p-3 rounded-xl shadow-2xl shadow-black 
+                         flex flex-col items-center relative group overflow-hidden border border-gray-700
                          transform transition-all duration-500 ease-out 
-                         hover:scale-[1.05] hover:shadow-red-900/80 hover:bg-gray-800/90 hover:z-10`}
+                         hover:scale-[1.05] hover:shadow-red-900/80 hover:bg-gray-800 hover:z-10`}
               
               // Subtle entrance animation wave
               style={{ animation: `fadeIn 0.6s ease-out forwards`, animationDelay: `${index * 0.08}s` }}
