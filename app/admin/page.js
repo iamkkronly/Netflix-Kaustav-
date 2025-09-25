@@ -12,7 +12,7 @@ export default function AdminPage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [password, setPassword] = useState("");
 
-  const ADMIN_PASSWORD = "abd123ab"; // Change this to secure password
+  const ADMIN_PASSWORD = "abd123abd"; // Change this to secure password
 
   // Fetch all movies (for admin panel)
   async function fetchMovies() {
