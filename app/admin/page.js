@@ -1,45 +1,39 @@
-// © 2025 Kaustav Ray. All rights reserved.
-// Licensed under the MIT License.
-
 "use client";
 
 import { useState, useEffect } from "react";
 
 export default function AdminPage() {
-  const [form, setForm] = useState({ title: "", thumbnail: "", link: "" });
-  const [movies, setMovies] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
   const [password, setPassword] = useState("");
+  const [movies, setMovies] = useState([]);
+  const [form, setForm] = useState({ title: "", thumbnail: "" });
+  const [message, setMessage] = useState("");
 
-  const ADMIN_PASSWORD = "abd123abd"; // Change this to secure password
+  // ✅ Hardcoded password for demo
+  const ADMIN_PASSWORD = "abd123abd"; // change this to your secret
 
-  // Fetch all movies (for admin panel)
+  // Fetch movies
   async function fetchMovies() {
     try {
-      const res = await fetch("/api/movies?limit=1000");
+      const res = await fetch("/api/movies");
       const data = await res.json();
-      setMovies(data.movies || []);
+      if (Array.isArray(data)) {
+        setMovies(data);
+      }
     } catch (err) {
-      console.error("Error fetching movies:", err);
+      console.error("Failed to fetch movies", err);
     }
   }
 
-  // Handle admin login
-  function handleLogin(e) {
-    e.preventDefault();
-    if (password === ADMIN_PASSWORD) {
-      setIsAdmin(true);
-      fetchMovies();
-    } else {
-      alert("❌ Incorrect password");
-    }
-  }
+  useEffect(() => {
+    if (loggedIn) fetchMovies();
+  }, [loggedIn]);
 
-  // Handle adding a movie
+  // Add movie
   async function handleAddMovie(e) {
     e.preventDefault();
-    setLoading(true);
+    setMessage("");
+
     try {
       const res = await fetch("/api/movies", {
         method: "POST",
@@ -47,129 +41,138 @@ export default function AdminPage() {
         body: JSON.stringify(form),
       });
 
+      const data = await res.json();
       if (res.ok) {
-        alert("✅ Movie added!");
-        setForm({ title: "", thumbnail: "", link: "" });
+        setMessage("✅ Movie added successfully!");
+        setForm({ title: "", thumbnail: "" });
         fetchMovies();
       } else {
-        const err = await res.json();
-        alert("❌ Failed to add movie: " + err.error);
+        setMessage("❌ Failed to add: " + data.error);
       }
     } catch (err) {
-      alert("❌ Error: " + err.message);
+      setMessage("❌ Error: " + err.message);
     }
-    setLoading(false);
   }
 
-  // Handle deleting a movie
+  // Delete movie
   async function handleDeleteMovie(id) {
-    if (!confirm("Are you sure you want to delete this movie?")) return;
+    setMessage("");
 
     try {
-      const res = await fetch(`/api/movies?id=${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/movies?id=${id}`, {
+        method: "DELETE",
+      });
+
+      const data = await res.json();
       if (res.ok) {
-        alert("✅ Movie deleted!");
+        setMessage("✅ Movie deleted");
         fetchMovies();
       } else {
-        const err = await res.json();
-        alert("❌ Failed to delete movie: " + err.error);
+        setMessage("❌ Failed to delete: " + data.error);
       }
     } catch (err) {
-      alert("❌ Error: " + err.message);
+      setMessage("❌ Error: " + err.message);
     }
   }
 
-  // Admin login page
-  if (!isAdmin) {
+  // Login
+  function handleLogin(e) {
+    e.preventDefault();
+    if (password === ADMIN_PASSWORD) {
+      setLoggedIn(true);
+      setPassword("");
+    } else {
+      setMessage("❌ Wrong password");
+    }
+  }
+
+  // ================= UI =================
+  if (!loggedIn) {
     return (
-      <main className="p-6">
-        <h1 className="text-2xl font-bold mb-4">🔐 Admin Login</h1>
-        <form onSubmit={handleLogin} className="space-y-4 max-w-md">
+      <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white">
+        <form
+          onSubmit={handleLogin}
+          className="bg-gray-800 p-6 rounded-xl shadow-lg"
+        >
+          <h2 className="text-xl font-bold mb-4">Admin Login</h2>
           <input
             type="password"
-            placeholder="Enter Admin Password"
-            className="w-full p-2 rounded text-black"
+            placeholder="Enter Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            required
+            className="w-full p-2 rounded text-black mb-4"
           />
           <button
             type="submit"
-            className="bg-red-600 px-4 py-2 rounded hover:bg-red-700"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg"
           >
             Login
           </button>
+          {message && <p className="mt-3 text-red-400">{message}</p>}
         </form>
-      </main>
+      </div>
     );
   }
 
-  // Admin panel page
   return (
-    <main className="p-6">
-      <h1 className="text-2xl font-bold mb-4">📤 Admin Panel</h1>
+    <div className="min-h-screen bg-gray-900 text-white p-6">
+      <h1 className="text-2xl font-bold mb-6">🎬 Admin Panel</h1>
 
       {/* Add Movie Form */}
       <form
         onSubmit={handleAddMovie}
-        className="space-y-4 max-w-md mb-6 bg-gray-900 p-4 rounded"
+        className="bg-gray-800 p-4 rounded-xl mb-6 shadow-lg"
       >
+        <h2 className="text-lg font-bold mb-4">Add New Movie</h2>
         <input
           type="text"
           placeholder="Movie Title"
-          className="w-full p-2 rounded text-black"
           value={form.title}
           onChange={(e) => setForm({ ...form, title: e.target.value })}
+          className="w-full p-2 rounded text-black mb-3"
           required
         />
         <input
-          type="url"
+          type="text"
           placeholder="Thumbnail URL"
-          className="w-full p-2 rounded text-black"
           value={form.thumbnail}
           onChange={(e) => setForm({ ...form, thumbnail: e.target.value })}
-          required
-        />
-        <input
-          type="url"
-          placeholder="Movie Link"
-          className="w-full p-2 rounded text-black"
-          value={form.link}
-          onChange={(e) => setForm({ ...form, link: e.target.value })}
+          className="w-full p-2 rounded text-black mb-3"
           required
         />
         <button
           type="submit"
-          className="bg-red-600 px-4 py-2 rounded hover:bg-red-700 disabled:opacity-50"
-          disabled={loading}
+          className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg"
         >
-          {loading ? "Adding..." : "Add Movie"}
+          Add Movie
         </button>
       </form>
 
+      {message && <p className="mb-4 text-yellow-400">{message}</p>}
+
       {/* Movies List */}
-      <h2 className="text-xl font-bold mb-2">🎬 Movies</h2>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+      <h2 className="text-lg font-bold mb-4">All Movies</h2>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {movies.map((movie) => (
           <div
             key={movie._id}
-            className="bg-gray-900 rounded-lg p-2 text-center relative"
+            className="bg-gray-800 p-3 rounded-lg shadow-lg flex flex-col items-center"
           >
             <img
               src={movie.thumbnail}
               alt={movie.title}
-              className="w-full h-32 object-cover rounded"
+              className="w-full h-40 object-cover rounded mb-2"
             />
-            <div className="mt-1">{movie.title}</div>
+            <p className="font-semibold text-center">{movie.title}</p>
             <button
               onClick={() => handleDeleteMovie(movie._id)}
-              className="absolute top-1 right-1 bg-red-600 px-2 py-1 text-xs rounded hover:bg-red-700"
+              className="mt-2 bg-red-600 hover:bg-red-700 text-white py-1 px-3 rounded-lg"
             >
               Delete
             </button>
           </div>
         ))}
       </div>
-    </main>
+    </div>
   );
 }
