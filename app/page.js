@@ -7,7 +7,7 @@ import { useState, useEffect, useCallback } from "react";
 
 // Define constants
 const MOVIES_PER_PAGE = 10;
-// ⚠️ Replace this with your actual Support Group URL
+// Updated link based on your previous input
 const SUPPORT_GROUP_LINK = "https://t.me/netflix1prime"; 
 
 export default function Homepage() {
@@ -101,7 +101,7 @@ export default function Homepage() {
         <div className="flex items-center justify-between w-full md:w-auto mb-4 md:mb-0">
             <h1 className="text-3xl md:text-4xl font-extrabold text-red-500 mr-8">Movie Library</h1>
             
-            {/* ✅ Support Group Link Added Here */}
+            {/* Support Group Link */}
             <a 
               href={SUPPORT_GROUP_LINK}
               target="_blank"
@@ -162,8 +162,23 @@ export default function Homepage() {
                 />
             </a>
 
-            <p className="font-semibold text-center text-md mb-2 truncate w-full px-1">{movie.title}</p>
-            
+            {/* 🔥 MODIFIED BLOCK: Movie Title - Two-line wrap logic */}
+            <div className="w-full h-10 overflow-hidden mb-2">
+                <p 
+                    className="font-semibold text-center text-md px-1" 
+                    // This inline style forces text to wrap into exactly 2 lines (Webkit browsers)
+                    style={{ 
+                        display: '-webkit-box', 
+                        WebkitLineClamp: 2, 
+                        WebkitBoxOrient: 'vertical', 
+                        overflow: 'hidden' 
+                    }}
+                >
+                    {movie.title}
+                </p>
+            </div>
+            {/* END MODIFIED BLOCK */}
+
             <a 
                 href={movie.link || "#"} 
                 target={movie.link ? "_blank" : "_self"} 
