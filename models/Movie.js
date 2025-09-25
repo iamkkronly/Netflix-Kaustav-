@@ -7,7 +7,7 @@ const MovieSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
     thumbnail: { type: String, required: true },
-    link: { type: String, required: true },
+    link: { type: String, required: true }, // Added movie link
   },
   { timestamps: true }
 );
