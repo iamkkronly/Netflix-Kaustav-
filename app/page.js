@@ -88,27 +88,26 @@ export default function Homepage() {
 
   // ================= UI / RETURN =================
   return (
-    // 🔥 ADJUSTED Background: Lighter Dark Gray (No deep black gradient)
-    <div className="min-h-screen text-white p-4 md:p-12 relative bg-gray-900">
-         {/* Removed inline style for radial gradient to use simple bg-gray-900 */}
+    // 🔥 New Background Color: Muted dark green/blue (using a custom hex via style)
+    <div className="min-h-screen text-white p-4 md:p-12 relative" 
+         style={{ backgroundColor: '#1C292E' }}> 
 
-      {/* Header: Sticky, Blurred, and Stylish */}
-      {/* Increased header opacity slightly for better contrast on a lighter dark background */}
-      <header className="sticky top-0 z-40 bg-gray-900/95 backdrop-blur-sm shadow-xl mb-8 border-b border-red-900/50 pt-4 pb-6 px-4 md:px-0 -mx-4 md:-mx-12">
+      {/* Header: Sticky, Blurred, and Stylish - Adjusted colors to match new theme */}
+      <header className="sticky top-0 z-40 bg-[#1C292E]/95 backdrop-blur-sm shadow-xl mb-8 border-b border-[#2C4953] pt-4 pb-6 px-4 md:px-0 -mx-4 md:-mx-12">
         <div className="flex flex-col md:flex-row md:justify-between md:items-center w-full max-w-7xl mx-auto">
           
           <div className="flex items-center justify-between w-full md:w-auto mb-4 md:mb-0">
-              {/* Cinematic Title */}
-              <h1 className="text-4xl md:text-5xl font-extrabold text-red-600 mr-8 drop-shadow-[0_4px_6px_rgba(255,0,0,0.5)] tracking-wider">
+              {/* Cinematic Title - Changed accent color to vibrant green */}
+              <h1 className="text-4xl md:text-5xl font-extrabold text-green-400 mr-8 drop-shadow-[0_4px_6px_rgba(52,211,163,0.5)] tracking-wider">
                   Movie Library
               </h1>
               
-              {/* Support Group Link - Highlighted Button */}
+              {/* Support Group Link - Adjusted button color to match theme */}
               <a 
                 href={SUPPORT_GROUP_LINK}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-red-700 hover:bg-red-600 text-white px-5 py-2 rounded-full font-bold text-sm transition duration-300 shadow-md shadow-red-800/50 hover:shadow-red-500/80 whitespace-nowrap"
+                className="bg-green-700 hover:bg-green-600 text-white px-5 py-2 rounded-full font-bold text-sm transition duration-300 shadow-md shadow-green-800/50 hover:shadow-green-500/80 whitespace-nowrap"
               >
                 🚀 Support Group
               </a>
@@ -122,12 +121,12 @@ export default function Homepage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               // Enhanced input styling
-              className="flex-grow p-3 rounded-xl bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-600 transition duration-300 border border-gray-700"
+              className="flex-grow p-3 rounded-2xl bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400 transition duration-300 border border-gray-600"
             />
             <button
               type="submit"
               // Enhanced button styling
-              className="bg-red-600 hover:bg-red-700 text-white px-5 py-3 rounded-xl font-bold transition duration-300 shadow-lg shadow-red-500/50 hover:shadow-red-400/80"
+              className="bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-2xl font-bold transition duration-300 shadow-lg shadow-green-500/50 hover:shadow-green-400/80"
             >
               Search
             </button>
@@ -148,16 +147,16 @@ export default function Homepage() {
           <p className="text-gray-400 text-center text-2xl mt-20 animate-pulse">Loading the Cinematic Universe...</p>
         )}
 
-        {/* Movies Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 md:gap-8">
+        {/* Movies Grid - Reduced gap for higher density, matching reference */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 md:gap-4">
           {movies.map((movie, index) => (
             <div
               key={movie._id}
-              // 🔥 ADJUSTED Card Color: Changed bg-gray-900/80 to bg-gray-800/90 for slightly lighter appearance and better contrast
-              className={`bg-gray-800/90 p-3 rounded-xl shadow-2xl shadow-black 
-                         flex flex-col items-center relative group overflow-hidden border border-gray-700
+              // 🔥 Card: Increased rounding (rounded-2xl) and adjusted colors/shadows
+              className={`bg-[#2C4953] p-3 rounded-2xl shadow-xl shadow-black/50
+                         flex flex-col items-center relative group overflow-hidden border border-[#3C5963]
                          transform transition-all duration-500 ease-out 
-                         hover:scale-[1.05] hover:shadow-red-900/80 hover:bg-gray-800 hover:z-10`}
+                         hover:scale-[1.05] hover:shadow-green-900/80 hover:bg-[#3C5963] hover:z-10`}
               
               // Subtle entrance animation wave
               style={{ animation: `fadeIn 0.6s ease-out forwards`, animationDelay: `${index * 0.08}s` }}
@@ -172,12 +171,12 @@ export default function Homepage() {
                   <img
                       src={movie.thumbnail}
                       alt={movie.title}
-                      // FIX 2: Use Template Literal for multi-line className (Image)
-                      className={`w-full h-60 object-cover rounded-lg mb-3 
+                      // Increased rounding (rounded-xl)
+                      className={`w-full h-60 object-cover rounded-xl mb-3 
                                 transition duration-500 group-hover:opacity-85 group-hover:scale-[1.02] group-hover:shadow-xl`}
                   />
-                  {/* Subtle Red Overlay on Hover */}
-                  <div className="absolute inset-0 bg-red-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  {/* Subtle Accent Overlay on Hover */}
+                  <div className="absolute inset-0 bg-green-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </a>
 
               {/* Movie Title - Two-line wrap logic (Fix carried over) */}
@@ -195,13 +194,13 @@ export default function Homepage() {
                   </p>
               </div>
 
-              {/* Watch Now Button */}
+              {/* Watch Now Button - Adjusted to match vibrant accent color */}
               <a 
                   href={movie.link || "#"} 
                   target={movie.link ? "_blank" : "_self"} 
                   rel="noopener noreferrer"
                   // Stylish Watch Button
-                  className="mt-2 w-full text-center bg-red-600 hover:bg-red-500 text-white py-2 rounded-full font-bold text-sm transition duration-300 shadow-md shadow-red-500/40 hover:shadow-red-400/80"
+                  className="mt-2 w-full text-center bg-green-600 hover:bg-green-500 text-white py-2 rounded-full font-bold text-sm transition duration-300 shadow-md shadow-green-500/40 hover:shadow-green-400/80"
               >
                   ▶️ Watch Now
               </a>
@@ -209,16 +208,16 @@ export default function Homepage() {
           ))}
         </div>
 
-        {/* Load More Button & Status */}
+        {/* Load More Button & Status - Adjusted colors */}
         {(hasMore || loading) && (
           <div className="flex justify-center mt-12">
             {loading && movies.length > 0 ? (
-              <p className="text-red-400 font-bold p-3 animate-pulse">Loading the next batch...</p>
+              <p className="text-green-400 font-bold p-3 animate-pulse">Loading the next batch...</p>
             ) : hasMore ? (
               <button
                 onClick={handleLoadMore}
                 // Cinematic Load More Button
-                className="bg-green-600 hover:bg-green-700 text-white py-3 px-10 rounded-full text-lg font-extrabold transition duration-300 shadow-xl shadow-green-500/50 hover:shadow-green-400/80 uppercase tracking-wider"
+                className="bg-teal-600 hover:bg-teal-700 text-white py-3 px-10 rounded-full text-lg font-extrabold transition duration-300 shadow-xl shadow-teal-500/50 hover:shadow-teal-400/80 uppercase tracking-wider"
                 disabled={loading}
               >
                 Load More
